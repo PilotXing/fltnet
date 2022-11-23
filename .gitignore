@@ -1,0 +1,6 @@
+*.pyc
+/img
+*.ipynb
+*.pdf
+.vscode
+chro*
