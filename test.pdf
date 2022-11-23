@@ -1,0 +1,51 @@
+<table class="table manual-detail-table">
+	<tr>
+		<th>所属航司：</th>
+		<td>{companyName}</td>
+	</tr>
+	<tr>
+		<th>发布单位：</th>
+		<td>{orgFullName}</td>
+	</tr>
+	<tr>
+		<th>手册类别：</th>
+		<td>{[Lib.EnumCode.getName('MMS', 'MANUAL_CATEGORY', values.manualCategory, values.manualCategory, '')]}</td>
+	</tr>
+	<tr>
+		<th>手册级别：</th>
+		<td>{[Lib.EnumCode.getName('MMS', 'MANUAL_LEVEL', values.manualLevel, values.manualLevel, '')]}</td>
+	</tr>
+	<tr>
+		<th>一级类型：</th>
+		<td>{firstType.name}
+			<tpl if="secondType"><span style="padding: 0 8px 0 58px;">二级类型：</span><span style="padding: 0 8px;">{secondType.name}</span></tpl>
+			<tpl if="thirdType"><span style="padding: 0 8px 0 50px;">三级类型：</span><span style="padding: 0 8px;">{thirdType.name}</span></tpl>
+		</td>
+	</tr>
+	<tr>
+		<th>手册名称：</th>
+		<td>{subject}</td>
+	</tr>
+	<tr>
+		<th>手册序号：</th>
+		<td>{code}</td>
+	</tr>
+	<tr>
+		<th>生效日期：</th>
+		<td>{publishDate}</td>
+	</tr>
+	<tpl if="trainingEndDate">
+	<tr>
+		<th>培训完成日期：</th>
+		<td>{trainingEndDate}</td>
+	</tr>
+	</tpl>
+	<tr>
+		<th>是否有密码：</th>
+		<td><tpl if="fileEncrypted">是<tpl else>否</tpl></td>
+	</tr>
+	<tr>
+		<th>PDF：</th>
+		<td><a href="{[App.cfg.restUrl]}/rest/mms/manual/download.do?id={id}&forFront={forFront}&fileName={fileName}&fileUrl={fileUrl}&isMobile={[App.isMobile()]}" target="_blank">{fileName}</a></td>
+	</tr>
+</table>
