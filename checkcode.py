@@ -39,7 +39,8 @@ class Data:
 
     duty = {
         'viewtype': 'today',
-        'showday': datetime.datetime.now().date().isoformat(),
+        # 'showday': datetime.datetime.now().date().isoformat(),
+        'showday':'2022-11-17',
         'planType': 0,
         'page': 1,
         'start': 0,

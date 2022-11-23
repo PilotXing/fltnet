@@ -1,7 +1,7 @@
 from exchangelib import Credentials, Account, Configuration, CalendarItem, Contact
 from exchangelib.indexed_properties import EmailAddress, PhoneNumber
 from exchangelib.errors import DoesNotExist
-from checkcode import PASSWORD, Configure
+from checkcode import Configure
 import datetime
 from test import get_schedule, login_browser, get_crew_info, cvt_timedate
 
@@ -17,6 +17,95 @@ my_account = Account(
     autodiscover=True,
     primary_smtp_address='{username}@hnair.com'.format(username=Configure.USERNAME))
 
+
+class Staff():
+    def __init__(self,data) -> None:
+        for key,value in data.items():
+            setattr(self,key,value)
+        self.email = self.loginId + '@hnair.com'
+
+    def to_contact(self):
+        if self.staffName != Configure.USERNAME_CN:
+            try:
+                res = my_account.contacts.get( given_name=self.staffName)
+                print('contact found')
+                body = res.body
+                new_body = body+'\n' + \
+                    self.flightDate+ self.flightNo
+                res.body = new_body
+                # res.save(update_fields=['body'])
+            except DoesNotExist:
+                print('not in contact')
+                join_group_date = self.enterGroupDate[:-2]
+                jgd = datetime.datetime.strptime(
+                    join_group_date, '%Y-%m-%d %H:%M:%S').date()
+                # create new
+                contact = Contact(
+                    folder=my_account.contacts,
+                    account=my_account,
+                    given_name=self.staffName,
+                    display_name=self.staffName,
+                    phone_numbers=[PhoneNumber(
+                        label='MobilePhone',
+                        phone_number=self.mobile
+                    )],
+                    job_title=self.techLevelName,
+                    company_name='HNA',
+                    body=self.flightDate + ' ' +
+                    self.flightNo,
+                    birthday=jgd
+                )
+                # contact.save()
+                print(contact)
+
+
+class Schedule():
+    def __init__(self,data) -> None:
+        for key,value in data.items():
+            setattr(self,key,value)
+        self.crews = self.__get_crews()
+
+    def to_calendar(self):
+        sign_up_time = self.signUpEndTime
+        if sign_up_time:
+            start = cvt_timedate(sign_up_time)
+        else:
+            start = cvt_timedate(self.std)
+        end = cvt_timedate(self.sta)
+        subject = self.fltNo+self.acNo+self.sector
+        body = 'STD:'+self.std + '\n' + 'STA:'+self.sta
+        flight = CalendarItem(
+            account=my_account,
+            folder=my_account.calendar,
+            start=start,
+            end=end,
+            subject=subject,
+            body=body,
+            reminder_minutes_before_start=55)
+
+        # flight.save()
+        print(flight)
+    
+    def __get_crews(self):
+        for crew_type in (1,2):
+            crews = get_crew_info(session=session,
+            fltInfo=self.__dict__,
+            crewTypeId=crew_type)
+        return crews.json().get('records')
+
+    def save_crews(self):
+        for data in self.crews:
+            crew = Staff(data)
+            print(crew.loginId)
+            crew.to_contact()
+
+if __name__ == '__main__':
+
+
+    s = Schedule(my_schedules[0])
+    # s.to_calendar()
+    s.save_crews()
+'''
 for sch in my_schedules:
     # add schedule to calendar
     sign_up_time = sch.get('signUpEndTime')
@@ -83,3 +172,4 @@ for sch in my_schedules:
                         birthday=jgd
                     )
                 #   contact.save()
+'''
