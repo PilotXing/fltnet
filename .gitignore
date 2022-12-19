@@ -5,3 +5,4 @@ img/
 .vscode
 *.zip
 __pycache__
+img/
