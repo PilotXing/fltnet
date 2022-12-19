@@ -1,4 +1,4 @@
-from exchangelib import Credentials, Account, Configuration, CalendarItem, Contact
+from exchangelib import Credentials, Account, CalendarItem, Contact
 from exchangelib.indexed_properties import EmailAddress, PhoneNumber
 from exchangelib.errors import DoesNotExist
 from checkcode import Configure
@@ -19,19 +19,22 @@ my_account = Account(
 
 
 class Staff():
-    def __init__(self,data) -> None:
-        for key,value in data.items():
-            setattr(self,key,value)
+    def __init__(self, data) -> None:
+        for key, value in data.items():
+            setattr(self, key, value)
         self.email = self.loginId + '@hnair.com'
 
     def to_contact(self):
+        # exclude myself
         if self.staffName != Configure.USERNAME_CN:
+            # if exists, update body, append flight No. & date to body
+            # if does not exist, create new contact
             try:
-                res = my_account.contacts.get( given_name=self.staffName)
+                res = my_account.contacts.get(given_name=self.staffName)
                 print('contact found')
                 body = res.body
                 new_body = body+'\n' + \
-                    self.flightDate+ self.flightNo
+                    self.flightDate + self.flightNo
                 res.body = new_body
                 # res.save(update_fields=['body'])
             except DoesNotExist:
@@ -40,6 +43,7 @@ class Staff():
                 jgd = datetime.datetime.strptime(
                     join_group_date, '%Y-%m-%d %H:%M:%S').date()
                 # create new
+                #TODO get photo of staff
                 contact = Contact(
                     folder=my_account.contacts,
                     account=my_account,
@@ -53,17 +57,23 @@ class Staff():
                     company_name='HNA',
                     body=self.flightDate + ' ' +
                     self.flightNo,
-                    birthday=jgd
+                    birthday=jgd,
+                    email_addresses=[EmailAddress(
+                        label='EmailAddress', email=self.email)]
                 )
                 # contact.save()
                 print(contact)
 
+    def remove(self):
+        res = my_account.contacts.pet(given_name=self.staffName)
+        res.delete()
+
 
 class Schedule():
-    def __init__(self,data) -> None:
-        for key,value in data.items():
-            setattr(self,key,value)
-        self.crews = self.__get_crews()
+    def __init__(self, data) -> None:
+        for key, value in data.items():
+            setattr(self, key, value)
+        self.crews = self.get_crews()
 
     def to_calendar(self):
         sign_up_time = self.signUpEndTime
@@ -85,26 +95,26 @@ class Schedule():
 
         # flight.save()
         print(flight)
-    
-    def __get_crews(self):
-        for crew_type in (1,2):
+
+    def get_crews(self):
+        for crew_type in (1, 2):
             crews = get_crew_info(session=session,
-            fltInfo=self.__dict__,
-            crewTypeId=crew_type)
+                                  fltInfo=self.__dict__,
+                                  crewTypeId=crew_type)
         return crews.json().get('records')
 
     def save_crews(self):
         for data in self.crews:
             crew = Staff(data)
-            print(crew.loginId)
             crew.to_contact()
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
 
     s = Schedule(my_schedules[0])
     # s.to_calendar()
     s.save_crews()
+    browser.close()
 '''
 for sch in my_schedules:
     # add schedule to calendar
