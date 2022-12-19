@@ -1,6 +1,6 @@
 *.pyc
-/img
+img/
 *.ipynb
 *.pdf
 .vscode
-chro*
+*.zip

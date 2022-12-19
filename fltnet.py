@@ -51,3 +51,27 @@ print(res.json().get('records')[0])
 
 
 browser.close()
+
+# def get_schedule(browser):
+#     res = []
+#     flights = browser.find_elements(
+#         By.XPATH, value='/html/body/div[4]/div[1]/div[2]/div[2]/div[1]/div[2]/div/div[2]/div/table/tbody/tr')
+#     for flight in flights:
+#         day = flight.find_element(By.XPATH, value='./td[1]/div').text
+#         date = flight.find_element(By.XPATH, value='./td[2]/div').text
+#         reg_number = flight.find_element(By.XPATH, value='./td[3]/div').text
+#         flight_number = flight.find_element(
+#             By.XPATH, value='./td[4]/div/span/a').text
+#         flight_route = flight.find_element(
+#             By.XPATH, value='./td[4]/div').text.partition('\n')[2]
+#         sign_time = flight.find_element(
+#             By.XPATH, value='./td[5]/div').text.partition(' - ')[2]
+#         ETD = flight.find_element(By.XPATH, value='./td[6]/div').text
+#         roll = flight.find_element(By.XPATH, value='./td[7]/div').text
+
+#         # print(day, date, reg_number, flight_number,
+#             # sign_time, flight_route, ETD, roll)
+#         res.append((day, date, reg_number, flight_number,
+#             sign_time, flight_route, ETD, roll))
+
+#     return res
